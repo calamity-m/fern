@@ -4,6 +4,8 @@ import (
 	"context"
 	"log/slog"
 	"os"
+
+	"github.com/calamity-m/fern/recorder/pkg/util"
 )
 
 var RequestIdHeader string = "X-Request-Id"
@@ -13,16 +15,7 @@ type LoggingHandler struct {
 	slog.Handler
 }
 
-// Retrieves a string from the provided context with the given key
-func retrieveCtxString(ctx context.Context, key any) string {
-	if val, ok := ctx.Value(key).(string); ok {
-		return val
-	}
-
-	return "unknown"
-}
-
-func New(opts ...func(*LoggingHandler)) *LoggingHandler {
+func NewHandler(opts ...func(*LoggingHandler)) *LoggingHandler {
 	handler := &LoggingHandler{}
 
 	for _, fn := range opts {
@@ -72,8 +65,8 @@ func WithBaseTextHandler(level slog.Level, addSource bool) func(*LoggingHandler)
 
 // Override the base Handle function to insert our attrs
 func (handler *LoggingHandler) Handle(ctx context.Context, r slog.Record) error {
-	r.AddAttrs(slog.String("request-id", retrieveCtxString(ctx, RequestIdHeader)))
-	r.AddAttrs(slog.String("environment", retrieveCtxString(ctx, "environment")))
+	r.AddAttrs(slog.String("request-id", util.RetrieveStringFromCtx(ctx, RequestIdHeader, "unknown")))
+	r.AddAttrs(slog.String("environment", util.RetrieveStringFromCtx(ctx, "environment", "unknown")))
 
 	return handler.Handler.Handle(ctx, r)
 }

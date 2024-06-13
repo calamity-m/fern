@@ -22,7 +22,7 @@ var (
 				os.Exit(1)
 			}
 
-			logger := slog.New(logging.New(
+			logger := slog.New(logging.NewHandler(
 				logging.WithEnvironment(cfg.Env),
 				logging.WithBaseHandler(cfg.Logging.Structured,
 					cfg.Logging.Level,
