@@ -1,1 +1,10 @@
+# Binaries directory
+bin/
+
+# Go related
+go.work
+
+# IDE related
 .vscode
+.fleet
+.idea
