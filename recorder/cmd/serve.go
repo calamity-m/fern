@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/calamity-m/fern/recorder/internal/config"
+	"github.com/calamity-m/fern/recorder/pkg/logging"
 	"github.com/spf13/cobra"
 )
 
@@ -13,8 +15,6 @@ var (
 		Use:   "serve",
 		Short: "Start serving",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Serve")
-
 			cfg, err := config.NewConfig("")
 
 			if err != nil {
@@ -22,7 +22,14 @@ var (
 				os.Exit(1)
 			}
 
-			fmt.Println(cfg)
+			logger := slog.New(logging.New(
+				logging.WithEnvironment(cfg.Env),
+				logging.WithBaseHandler(cfg.Logging.Structured,
+					cfg.Logging.Level,
+					cfg.Logging.AddSource,
+				)))
+
+			logger.Info("Initialized logging and configuration")
 		},
 	}
 )

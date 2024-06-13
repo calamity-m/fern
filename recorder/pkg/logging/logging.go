@@ -3,6 +3,7 @@ package logging
 import (
 	"context"
 	"log/slog"
+	"os"
 )
 
 var RequestIdHeader string = "X-Request-Id"
@@ -34,6 +35,38 @@ func New(opts ...func(*LoggingHandler)) *LoggingHandler {
 func WithEnvironment(env string) func(*LoggingHandler) {
 	return func(handler *LoggingHandler) {
 		handler.Environment = env
+	}
+}
+
+func WithBaseHandler(structured bool, level slog.Level, addSource bool) func(*LoggingHandler) {
+	if structured {
+		return WithBaseJsonHandler(level, addSource)
+	} else {
+		return WithBaseTextHandler(level, addSource)
+	}
+}
+
+func WithBaseJsonHandler(level slog.Level, addSource bool) func(*LoggingHandler) {
+	return func(handler *LoggingHandler) {
+		handler.Handler = slog.NewJSONHandler(
+			os.Stderr,
+			&slog.HandlerOptions{
+				Level:     level,
+				AddSource: addSource,
+			},
+		)
+	}
+}
+
+func WithBaseTextHandler(level slog.Level, addSource bool) func(*LoggingHandler) {
+	return func(handler *LoggingHandler) {
+		handler.Handler = slog.NewTextHandler(
+			os.Stderr,
+			&slog.HandlerOptions{
+				Level:     level,
+				AddSource: addSource,
+			},
+		)
 	}
 }
 
