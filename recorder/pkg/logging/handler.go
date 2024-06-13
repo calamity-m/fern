@@ -4,8 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"os"
-
-	"github.com/calamity-m/fern/recorder/pkg/util"
 )
 
 var RequestIdHeader string = "X-Request-Id"
@@ -65,8 +63,8 @@ func WithBaseTextHandler(level slog.Level, addSource bool) func(*LoggingHandler)
 
 // Override the base Handle function to insert our attrs
 func (handler *LoggingHandler) Handle(ctx context.Context, r slog.Record) error {
-	r.AddAttrs(slog.String("request-id", util.RetrieveStringFromCtx(ctx, RequestIdHeader, "unknown")))
-	r.AddAttrs(slog.String("environment", util.RetrieveStringFromCtx(ctx, "environment", "unknown")))
+	r.AddAttrs(slog.String("request-id", RetrieveStringFromCtx(ctx, RequestIdHeader, "unknown")))
+	r.AddAttrs(slog.String("environment", handler.Environment))
 
 	return handler.Handler.Handle(ctx, r)
 }
